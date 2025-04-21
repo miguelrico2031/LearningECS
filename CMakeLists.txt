@@ -48,6 +48,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
+# fetch and download glm
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG        1.0.1
+)
+FetchContent_MakeAvailable(glm)
+
 
 # set OPENGL_LIB to the OS specific openGL library
 if(WIN32)
@@ -65,7 +73,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/external/glfw/include
 )
 
-target_link_libraries(LearningECS PRIVATE glfw ${OPENGL_LIB})
+target_link_libraries(LearningECS PRIVATE glfw ${OPENGL_LIB} glm::glm)
 
 
 

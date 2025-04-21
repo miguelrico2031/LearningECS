@@ -1,16 +1,18 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
 #include "const.h"
+#include "Log.h"
+#include "Shader.h"
+#include "Texture.h"
+#include <cmath>
 
 
 void onWindowResize(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-void loadShaders();
+
 void createTriangle();
 
 
-GLuint shaderProgram;
 GLuint vbo;
 GLuint ebo;
 GLuint vao;
@@ -27,11 +29,12 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
+
 	// create a window object
 	GLFWwindow* window = glfwCreateWindow(WINDOW::WIDTH, WINDOW::HEIGHT, "LearningECS", NULL, NULL);
 	if (window == NULL)
 	{
-		std::cout << "Failed to create GLFW window\n";
+		std::cerr << "Failed to create GLFW window\n";
 		glfwTerminate();
 		return -1;
 	}
@@ -40,7 +43,7 @@ int main()
 	// init GLAD (loads all OpenGL function pointers)
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		std::cout << "Failed to init GLAD\n";
+		LOG_ERROR("Failed to init GLAD");
 		return -1;
 	}
 
@@ -48,7 +51,10 @@ int main()
 	glViewport(0, 0, WINDOW::WIDTH, WINDOW::HEIGHT);
 	glfwSetFramebufferSizeCallback(window, onWindowResize);
 
-	loadShaders();
+	Shader shader("../assets/shaders/basic.vert", "../assets/shaders/basic.frag");
+	Texture texture("../assets/textures/laura.png");
+	GLint blueUniformLoc = shader.getLocation("blue");
+
 	createTriangle();
 
 	//loop
@@ -59,7 +65,12 @@ int main()
 		//render calls
 		glClearColor(0.1f, 0.05f, 0.25f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glUseProgram(shaderProgram);
+
+
+		shader.activate();
+		float value = (sin(glfwGetTime() * 5.0f) + 1.0f) * 0.5f;
+		//shader.setFloat(blueUniformLoc, value);
+		texture.activate();
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -92,80 +103,16 @@ void processInput(GLFWwindow* window)
 
 }
 
-void loadShaders()
-{
-	//vertex shader
-	const char* vertexShaderSource = "#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"}\0";
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-
-	int success;
-	char errorLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, errorLog);
-		std::cout << "Error: vertex shader compilation failed: \n" << errorLog << "\n";
-		return;
-	}
-	//fragment shader
-	const char* fragmentShaderSource = "#version 330 core\n"
-		"out vec4 color;\n"
-		"void main()\n"
-		"{\n"
-		"    color = vec4(0.6f, 0.1f, 0.2f, 1.0f);\n"
-		"}\0";
-
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, errorLog);
-		std::cout << "Error: fragment shader compilation failed: \n" << errorLog << "\n";
-		return;
-	}
-
-	//shader program
-	shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderProgram, 512, NULL, errorLog);
-		std::cout << "Error: shader progam linking failed: \n" << errorLog << "\n";
-		return;
-	}
-
-	glUseProgram(shaderProgram);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-}
-
-
-
 void createTriangle()
 {
 	float vertices[] =
-	{
-		 0.5f,  0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		-0.5f, -0.5f, 0.0f,
-		-0.5f,  0.5f, 0.0f
+	{	 // positions			 // colors				// uvs
+		 0.5f,  0.5f,  0.0f,	 1.0f, 0.0f, 0.0f,		1.0f, 1.0f,
+		 0.5f, -0.5f,  0.0f,	 0.0f, 1.0f, 0.0f,		1.0f, 0.0f,
+		-0.5f, -0.5f,  0.0f,	 0.0f, 0.0f, 1.0f,		0.0f, 0.0f,
+		-0.5f,  0.5f,  0.0f,	 1.0f, 1.0f, 0.0f,		0.0f, 1.0f 
 	};
+
 
 	unsigned int indices[] =
 	{
@@ -188,9 +135,21 @@ void createTriangle()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	//configure the active vao
+	//position attribute:
 	GLuint positionAttributeLocation = 0u;  //the location specificated in the vertex shader
-	glVertexAttribPointer(positionAttributeLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
+	glVertexAttribPointer(positionAttributeLocation, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*)0);
 	glEnableVertexAttribArray(positionAttributeLocation); //enable the attribute
+
+	//color attribute:
+	GLuint colorAttributeLocation = 1u;  //the location specificated in the vertex shader
+	glVertexAttribPointer(colorAttributeLocation, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(colorAttributeLocation); //enable the attribute
+
+
+	//uv attribute:
+	GLuint uvAttributeLocation = 2u;  //the location specificated in the vertex shader
+	glVertexAttribPointer(uvAttributeLocation, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(uvAttributeLocation); //enable the attribute
 }
 
 

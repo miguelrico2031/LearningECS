@@ -1,4 +1,4 @@
-
+#pragma once
 namespace WINDOW
 {
 	constexpr int WIDTH = 800;
