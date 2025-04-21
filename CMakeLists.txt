@@ -3,13 +3,41 @@ project(LearningECS)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin/Debug)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/Release)
 
-# Path to the header files
-include_directories(
-    ${PROJECT_SOURCE_DIR}/external/glad/include
-    ${PROJECT_SOURCE_DIR}/external/glfw/include
-    ${PROJECT_SOURCE_DIR}/include
+file(GLOB_RECURSE HEADER_FILES
+    ${PROJECT_SOURCE_DIR}/src/*.h
+    ${PROJECT_SOURCE_DIR}/src/*.hpp
 )
+file(GLOB_RECURSE SOURCE_FILES
+    ${PROJECT_SOURCE_DIR}/src/*.c
+    ${PROJECT_SOURCE_DIR}/src/*.cpp
+)
+file(GLOB_RECURSE ASSET_FILES
+    ${PROJECT_SOURCE_DIR}/assets/*
+)
+
+
+
+source_group(TREE ${PROJECT_SOURCE_DIR}/src PREFIX "Header Files" FILES ${HEADER_FILES})
+source_group(TREE ${PROJECT_SOURCE_DIR}/src PREFIX "Source Files" FILES ${SOURCE_FILES})
+source_group(TREE ${PROJECT_SOURCE_DIR}/assets PREFIX "Assets" FILES ${ASSET_FILES})
+
+add_executable(LearningECS ${HEADER_FILES} ${SOURCE_FILES} ${ASSET_FILES})
+
+
+
+add_custom_target(copy_assets ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${PROJECT_SOURCE_DIR}/assets
+    $<IF:$<CONFIG:Debug>,${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/assets,${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/assets>
+    COMMENT "Copying assets to output directory"
+)
+
+add_dependencies(LearningECS copy_assets)
+
+
 
 # fetch and download glfw
 include(FetchContent)
@@ -20,10 +48,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
-add_executable(LearningECS
-    src/main.cpp
-    src/glad.c
-)
 
 # set OPENGL_LIB to the OS specific openGL library
 if(WIN32)
@@ -35,12 +59,13 @@ elseif(UNIX)
     set(OPENGL_LIB GL)
 endif()
 
-# link glfw and openGL
+
+include_directories(
+    ${PROJECT_SOURCE_DIR}/external/glad/include
+    ${PROJECT_SOURCE_DIR}/external/glfw/include
+)
+
 target_link_libraries(LearningECS PRIVATE glfw ${OPENGL_LIB})
-
-
-
-
 
 
 
