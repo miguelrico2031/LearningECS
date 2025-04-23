@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include "Log.h"
+#include <glm/gtc/type_ptr.hpp>
 
 Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
 {
@@ -65,37 +66,27 @@ void Shader::activate()
 	glUseProgram(m_shaderProgramID);
 }
 
-void Shader::setBool(const std::string& name, bool value)
-{
-	GLint location = glGetUniformLocation(m_shaderProgramID, name.c_str());
-	glUniform1i(location, (int)value);
-}
 
 void Shader::setBool(GLint location, bool value)
 {
 	glUniform1i(location, (int)value);
 }
 
-void Shader::setInt(const std::string& name, int value)
-{
-	GLint location = glGetUniformLocation(m_shaderProgramID, name.c_str());
-	glUniform1i(location, value);
-}
 
 void Shader::setInt(GLint location, int value)
 {
 	glUniform1i(location, value);
 }
 
-void Shader::setFloat(const std::string& name, float value)
-{
-	GLint location = glGetUniformLocation(m_shaderProgramID, name.c_str());
-	glUniform1f(location, value);
-}
 
 void Shader::setFloat(GLint location, float value)
 {
 	glUniform1f(location, value);
+}
+
+void Shader::setMat4(GLint location, glm::mat4 mat4)
+{
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat4));
 }
 
 std::string Shader::readFromFile(const std::string& filePath)

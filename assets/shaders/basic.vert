@@ -6,9 +6,11 @@ layout (location = 2) in vec2 inUv;
 out vec3 color;
 out vec2 uv;
 
+uniform mat4 modelViewProj;
+
 void main()
 {
-	gl_Position = vec4(inPos.x, inPos.y, inPos.z, 1.0);
 	color = inColor;
 	uv = inUv;
+	gl_Position = modelViewProj * vec4(inPos, 1.0);
 }
