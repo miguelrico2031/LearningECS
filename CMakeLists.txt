@@ -27,6 +27,10 @@ source_group(TREE ${PROJECT_SOURCE_DIR}/assets PREFIX "Assets" FILES ${ASSET_FIL
 add_executable(LearningECS ${HEADER_FILES} ${SOURCE_FILES} ${ASSET_FILES})
 
 
+target_include_directories(LearningECS PRIVATE
+    ${PROJECT_SOURCE_DIR}/src
+)
+
 
 add_custom_target(copy_assets ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
