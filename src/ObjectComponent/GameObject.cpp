@@ -1,31 +1,30 @@
 #include "GameObject.h"
 #include "Transform.h"
 #include "Log.h"
+#include "Scene.h"
 
 namespace ObjectComponent
 {
-	GameObject::GameObject() : m_active(true), m_tag("Unnamed")
+	GameObject::GameObject(Scene* scene) : m_scene(scene), m_tag("Unnamed")
 	{
-		LOG("creado game object!");
+		LOG("GameObject created!");
 		m_components.push_back(std::make_unique<Transform>(this));
-		m_transform = static_cast<Transform*>(m_components[0].get());
-	}
-	GameObject::GameObject(const std::string& tag) : m_tag(tag)
-	{
-		LOG("creado game object!");
-		m_components.push_back(std::make_unique<Transform>(this));
-		m_transform = static_cast<Transform*>(m_components[0].get());
-	}
-	GameObject::GameObject(const std::string& tag, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
-		: m_tag(tag)
-	{
-		LOG("creado game object!");
-		m_components.push_back(std::make_unique<Transform>(this, position, rotation, scale));
 		m_transform = static_cast<Transform*>(m_components[0].get());
 	}
 
-	Transform* GameObject::getTransform() const
+	GameObject::GameObject(Scene* scene, const std::string& tag) : m_scene(scene), m_tag(tag)
 	{
-		return m_transform;
+		LOG("GameObject created!");
+		m_components.push_back(std::make_unique<Transform>(this));
+		m_transform = static_cast<Transform*>(m_components[0].get());
+	}
+
+	void GameObject::onComponentAdded(Component* component)
+	{
+		m_scene->onComponentAdded(this, component);
+	}
+	void GameObject::onComponentRemoved(Component* component)
+	{
+		m_scene->onComponentRemoved(this, component);
 	}
 }

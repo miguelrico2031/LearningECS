@@ -22,6 +22,8 @@ namespace ObjectComponent
 		void setBool(GLint location, bool value);
 		void setInt(GLint location, int value);
 		void setFloat(GLint location, float value);
+		void setVec3(GLint location, glm::vec3 vec3);
+		void setVec4(GLint location, glm::vec4 vec4);
 		void setMat4(GLint location, glm::mat4 mat4);
 
 		void clear();

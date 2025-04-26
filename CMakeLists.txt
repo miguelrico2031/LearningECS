@@ -61,6 +61,24 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glm)
 
 
+# fetch and download Bullet
+FetchContent_Declare(
+  bullet
+  GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
+  GIT_TAG        master
+)
+
+# disable demos and gui builds
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_BULLET2_DEMOS OFF CACHE BOOL "" FORCE)
+set(BUILD_CPU_DEMOS OFF CACHE BOOL "" FORCE)
+set(BUILD_OPENGL3_DEMOS OFF CACHE BOOL "" FORCE)
+set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+set(INSTALL_LIBS OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(bullet)
+
+
 # set OPENGL_LIB to the OS specific openGL library
 if(WIN32)
     set(OPENGL_LIB opengl32)
@@ -75,9 +93,17 @@ endif()
 include_directories(
     ${PROJECT_SOURCE_DIR}/external/glad/include
     ${PROJECT_SOURCE_DIR}/external/glfw/include
+    ${bullet_SOURCE_DIR}/src
+    ${bullet_SOURCE_DIR}/src/bullet
 )
 
-target_link_libraries(LearningECS PRIVATE glfw ${OPENGL_LIB} glm::glm)
-
+target_link_libraries(LearningECS PRIVATE
+    glfw 
+    ${OPENGL_LIB} 
+    glm::glm
+    BulletDynamics
+    BulletCollision
+    LinearMath
+)
 
 

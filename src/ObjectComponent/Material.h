@@ -15,7 +15,11 @@ namespace ObjectComponent
 		inline Shader& getShader() { return m_shader; }
 		inline Texture& getTexture() { return m_texture; }
 
-		inline void setColor(glm::vec4 color) { m_color = color; }
+		inline void setColor(glm::vec4 color)
+		{
+			m_color = color;
+			m_shader.setVec4(m_colorUniformLocation, m_color);
+		}
 
 		void activate() const
 		{
@@ -27,6 +31,7 @@ namespace ObjectComponent
 		Shader m_shader;
 		Texture m_texture;
 		glm::vec4 m_color = { 1.0f, 1.0f, 1.0f, 1.0f };
-
+		GLint m_colorUniformLocation = -1;
+		GLint m_hasTextureUniformLocation = -1;
 	};
 }

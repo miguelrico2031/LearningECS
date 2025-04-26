@@ -6,7 +6,7 @@ namespace ObjectComponent
 {
 	namespace Primitives
 	{
-		std::shared_ptr<Mesh> createQuadMesh()
+		inline static std::shared_ptr<Mesh> createQuadMesh()
 		{
 			static const std::vector<float> vertices =
 			{	 // positions			 // colors				// uvs
@@ -26,7 +26,7 @@ namespace ObjectComponent
 		}
 
 
-		std::shared_ptr<Mesh> createCubeMesh()
+		inline static std::shared_ptr<Mesh> createCubeMesh()
 		{
 
 			static const std::vector<float> vertices =
@@ -82,7 +82,7 @@ namespace ObjectComponent
 			return std::make_shared<Mesh>(vertices, indices);
 		}
 
-		std::shared_ptr<Mesh> createSphereMesh(unsigned int sectorCount = 36, unsigned int stackCount = 18)
+		inline static std::shared_ptr<Mesh> createSphereMesh(unsigned int sectorCount = 36, unsigned int stackCount = 18)
 		{
 			std::vector<float> vertices;
 			std::vector<unsigned int> indices;

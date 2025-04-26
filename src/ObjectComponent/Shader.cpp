@@ -27,23 +27,39 @@ namespace ObjectComponent
 
 	void Shader::setBool(GLint location, bool value)
 	{
+		glUseProgram(m_shaderProgramID);
 		glUniform1i(location, (int)value);
 	}
 
 
 	void Shader::setInt(GLint location, int value)
 	{
+		glUseProgram(m_shaderProgramID);
 		glUniform1i(location, value);
 	}
 
 
 	void Shader::setFloat(GLint location, float value)
 	{
+		glUseProgram(m_shaderProgramID);
 		glUniform1f(location, value);
+	}
+
+	void Shader::setVec3(GLint location, glm::vec3 vec3)
+	{
+		glUseProgram(m_shaderProgramID);
+		glUniform3fv(location, 1, glm::value_ptr(vec3));
+	}
+
+	void Shader::setVec4(GLint location, glm::vec4 vec4)
+	{
+		glUseProgram(m_shaderProgramID);
+		glUniform4fv(location, 1, glm::value_ptr(vec4));
 	}
 
 	void Shader::setMat4(GLint location, glm::mat4 mat4)
 	{
+		glUseProgram(m_shaderProgramID);
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat4));
 	}
 
