@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "Camera.h"
+#include "Physics.h"
 
 namespace ObjectComponent
 {
@@ -29,6 +30,9 @@ namespace ObjectComponent
 		std::vector<std::unique_ptr<GameObject>> m_gameObjects;
 		std::vector<Camera*> m_cameras;
 		Camera* m_activeCamera = nullptr;
+	public:
+		Physics m_physics;
+
 	private:
 		void findMainCamera();
 	};

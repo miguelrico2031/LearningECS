@@ -6,7 +6,12 @@
 #include "ObjectComponent/Transform.h"
 #include "ObjectComponent/MeshRenderer.h"
 #include "ObjectComponent/Primitives.h"
+#include "ObjectComponent/Physics.h"
+#include "ObjectComponent/Rigidbody.h"
+#include "ObjectComponent/Collider.h"
+
 #include <glm/glm.hpp>
+
 
 using namespace ObjectComponent;
 
@@ -19,6 +24,12 @@ void Editor::update(float deltaTime)
 {
 	moveCamera(deltaTime);
 	rotateCamera(deltaTime);
+
+	if (Input::isKeyHeld(GLFW_KEY_P))
+	{
+		LOG("HOLD");
+		//Game::get().getScene()->m_physics.fixedUpdate();
+	}
 }
 
 void Editor::fixedUpdate()
@@ -35,18 +46,27 @@ void Editor::setUpTestScene()
 	cam->getTransform()->setPosition({ 0, 3, 3 });
 
 
+	GameObject* floor = scene->createGameObject("Floor");
+
+	Transform* floorTransform = floor->getTransform();
+	floorTransform->setRotation({ -90, 0, 10 });
+	floorTransform->setScale({ 100, 100, 1 });
+
 	std::shared_ptr<Mesh> quadMesh = Primitives::createQuadMesh();
 	std::shared_ptr<Material> floorMat = std::make_shared<Material>(
 		"../assets/shaders/basic.vert",
 		"../assets/shaders/basic.frag");
 	floorMat->setColor({ 0.06f, 0.3f, 0.2f, 1.0f });
-	GameObject* floor = scene->createGameObject("Floor");
 	MeshRenderer* meshRenderer = floor->addComponent<MeshRenderer>();
 	meshRenderer->setMesh(quadMesh);
 	meshRenderer->setMaterial(floorMat);
-	Transform* floorTransform = floor->getTransform();
-	floorTransform->setRotation({ -90, 0, 0 });
-	floorTransform->setScale({ 10, 10, 10 });
+
+	BoxCollider* floorCol = floor->addComponent<BoxCollider>();
+	floorCol->setHalfExtents(floorTransform->getScale() * 0.5f);
+	Rigidbody* floorRb = floor->addComponent<Rigidbody>();
+	//make it static
+	floorRb->getBulletRigidbody()->setMassProps(0.0f, btVector3( 0, 0, 0 ));
+	floorRb->getBulletRigidbody()->setRestitution(0.75f);
 
 
 	std::shared_ptr<Material> sphereMat = std::make_shared<Material>(
@@ -56,10 +76,10 @@ void Editor::setUpTestScene()
 	std::shared_ptr<Mesh> sphereMesh = Primitives::createSphereMesh();
 	std::vector<glm::vec3> positions =
 	{
-		{ 5, 3,  0},
-		{-5, 3,  0},
-		{ 0, 3,  5},
-		{ 0, 3, -5}
+		{ 5, 40,  0},
+		{-5, 40,  0},
+		{ 0, 40,  5},
+		{ 0, 40, -5}
 	};
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -70,6 +90,12 @@ void Editor::setUpTestScene()
 		MeshRenderer* meshRenderer = sphere->addComponent<MeshRenderer>();
 		meshRenderer->setMesh(sphereMesh);
 		meshRenderer->setMaterial(sphereMat);
+
+		SphereCollider* sphereCol = sphere->addComponent<SphereCollider>();
+		sphereCol->setRadius(0.5f);
+		Rigidbody* rb = sphere->addComponent<Rigidbody>();
+		rb->getBulletRigidbody()->setRestitution(0.75f);
+
 	}
 }
 
@@ -126,8 +152,6 @@ void Editor::moveCamera(float deltaTime)
 void Editor::rotateCamera(float deltaTime)
 {
 	glm::vec2 offset = Input::getMouseDelta();
-	if(glm::length(offset) != 0)
-		LOG("deltamouse: " << offset.x << "  " << offset.y);
 	offset *= cameraMoveParams.sensitivity * deltaTime;
 
 	if (Camera* camera = Game::get().getScene()->getActiveCamera())

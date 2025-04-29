@@ -65,8 +65,12 @@ void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	previousKeys[key] = currentKeys[key];
-	currentKeys[key] = (action != GLFW_RELEASE);
+	// Update the current key state based on the action
+	if (action == GLFW_PRESS) {
+		currentKeys[key] = true;
+	} else if (action == GLFW_RELEASE) {
+		currentKeys[key] = false;
+	}
 }
 
 void Input::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -91,5 +95,11 @@ void Input::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 
 void Input::update()
 {
-	mouseDelta = { 0.0f, 0.0f };
+	// Synchronize previousKeys with currentKeys for the next frame
+	previousKeys = currentKeys;
+
+	// Update mouse button states similarly if needed
+	previousMouseButtons = currentMouseButtons;
+
+	mouseDelta = { 0, 0 };
 }

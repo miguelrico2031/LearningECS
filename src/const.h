@@ -8,14 +8,14 @@ namespace WINDOW
 
 namespace TIME
 {
-	constexpr float FIXED_DELTA_TIME = 60.0f;
+	constexpr float FIXED_DELTA_TIME = 1/60.0f;
 }
 
 namespace CAMERA
 {
 	constexpr float V_FOV_DEGREES = 45.0f;
 	constexpr float NEAR = 0.1f;
-	constexpr float FAR = 100.0f;
+	constexpr float FAR = 1000.0f;
 	constexpr float ORTHO_SIZE = 10.0f;
 	const glm::vec4 CLEAR_COLOR = { 0.2f, 0.0f, 0.1f, 1.0f };
 }

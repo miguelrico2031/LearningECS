@@ -1,9 +1,11 @@
 #include "Scene.h"
 #include "MeshRenderer.h"
+#include "Rigidbody.h"
 namespace ObjectComponent
 {
 	void Scene::load()
 	{
+		m_physics.initialize();
 	}
 
 	void Scene::unload()
@@ -16,6 +18,7 @@ namespace ObjectComponent
 
 	void Scene::fixedUpdate()
 	{
+		m_physics.fixedUpdate();
 	}
 
 	void Scene::render()
@@ -79,6 +82,10 @@ namespace ObjectComponent
 			m_cameras.push_back(cam);
 			m_activeCamera = cam;
 		}
+		else if (Rigidbody* rb = dynamic_cast<Rigidbody*>(component))
+		{
+			m_physics.addRigidbody(rb);
+		}
 	}
 
 	void Scene::onComponentRemoved(GameObject* gameObject, Component* component)
@@ -90,6 +97,10 @@ namespace ObjectComponent
 			{
 				findMainCamera();
 			}
+		}
+		else if (Rigidbody* rb = dynamic_cast<Rigidbody*>(component))
+		{
+			m_physics.removeRigidbody(rb);
 		}
 	}
 	void Scene::findMainCamera()

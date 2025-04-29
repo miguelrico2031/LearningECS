@@ -4,8 +4,8 @@
 #include <memory>
 #include <btBulletDynamicsCommon.h>
 
-#include "ObjectComponent/Scene.h"
 #include "Editor.h"
+#include "ObjectComponent/Scene.h"
 
 
 
@@ -38,13 +38,6 @@ private:
 	std::unique_ptr<ObjectComponent::Scene> m_activeScene = nullptr;
 
 	Editor* m_editor = nullptr;
-
-	//physics objects
-	std::unique_ptr<btDefaultCollisionConfiguration> collisionConfiguration;
-	std::unique_ptr<btCollisionDispatcher> dispatcher;
-	std::unique_ptr<btBroadphaseInterface> overlappingPairCache;
-	std::unique_ptr<btSequentialImpulseConstraintSolver> solver;
-	std::unique_ptr<btDiscreteDynamicsWorld> dynamicsWorld;
 
 
 	float m_deltaTime = 0.0f, m_lastFrameTime = 0.0f, m_accumulatedTime = 0.0f;

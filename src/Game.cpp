@@ -16,6 +16,7 @@ Scene* Game::createScene()
 		m_activeScene->unload();
 	}
 	m_activeScene = std::make_unique<Scene>();
+	m_activeScene->load();
 	return m_activeScene.get();
 }
 
@@ -26,7 +27,6 @@ void Game::setUp()
 		return;
 
 	Input::initialize(m_window);
-
 }
 
 void Game::runLoop()
