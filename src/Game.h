@@ -1,14 +1,13 @@
 #pragma once
+#include "BaseScene.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <memory>
-#include <btBulletDynamicsCommon.h>
-
-#include "Editor.h"
-#include "ObjectComponent/Scene.h"
 
 
 
+class BaseEditor;
 class Game
 {
 public:
@@ -18,12 +17,23 @@ public:
 		return s_singleton;
 	}
 
-	inline ObjectComponent::Scene* getScene() const { return m_activeScene.get(); }
+	inline BaseScene* getScene() const { return m_activeScene.get(); }
 	inline GLFWwindow* getWindow() const { return m_window; }
 
-	inline void attachEditor(Editor* editor) { m_editor = editor; m_editor->onAttach(); }
+	void attachEditor(BaseEditor* editor);
 
-	ObjectComponent::Scene* createScene();
+	template <class Scene_T>
+	Scene_T* createScene()
+	{
+		static_assert(std::is_base_of<BaseScene, Scene_T>::value, "Scene_T must inherit from BaseScene");
+		if (m_activeScene != nullptr)
+		{
+			m_activeScene->unload();
+		}
+		m_activeScene = std::make_unique<Scene_T>();
+		m_activeScene->load();
+		return static_cast<Scene_T*>(m_activeScene.get());
+	}
 
 
 	void setUp();
@@ -35,9 +45,9 @@ private:
 	static Game s_singleton;
 	GLFWwindow* m_window = nullptr; //TODO: could be unique_ptr ??
 
-	std::unique_ptr<ObjectComponent::Scene> m_activeScene = nullptr;
+	std::unique_ptr<BaseScene> m_activeScene = nullptr;
 
-	Editor* m_editor = nullptr;
+	BaseEditor* m_editor = nullptr;
 
 
 	float m_deltaTime = 0.0f, m_lastFrameTime = 0.0f, m_accumulatedTime = 0.0f;

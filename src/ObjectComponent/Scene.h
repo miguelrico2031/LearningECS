@@ -1,22 +1,24 @@
 #pragma once
+#include "BaseScene.h"
 #include "GameObject.h"
 #include "Camera.h"
 #include "Physics.h"
 
 namespace ObjectComponent
 {
-	class Scene
+	class Scene : public BaseScene
 	{
 	public:
 		Scene() = default;
 
 		inline Camera* getActiveCamera() const { return m_activeCamera; }
 
-		void load();
-		void unload();
-		void update(float deltaTime);
-		void fixedUpdate();
-		void render();
+		virtual void load() override;
+		virtual void unload() override;
+		virtual void update() override;
+		virtual void fixedUpdate() override;
+		virtual void render() override;
+		virtual void onWindowResize(int width, int height) override;
 
 		GameObject* createGameObject();
 		GameObject* createGameObject(const std::string& tag);

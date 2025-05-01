@@ -13,17 +13,17 @@ namespace ObjectComponent
 
 	glm::vec3 Transform::getForward() const
 	{
-		return glm::normalize(glm::rotate(glm::quat(m_rotation), { 0.0f, 0.0f, -1.0f }));
+		return glm::normalize(glm::rotate(glm::quat(glm::radians(m_rotation)), { 0.0f, 0.0f, -1.0f }));
 	}
 
 	glm::vec3 Transform::getRight() const
 	{
-		return glm::normalize(glm::rotate(glm::quat(m_rotation), { 1.0f, 0.0f, 0.0f }));
+		return glm::normalize(glm::rotate(glm::quat(glm::radians(m_rotation)), { 1.0f, 0.0f, 0.0f }));
 	}
 
 	glm::vec3 Transform::getUp() const
 	{
-		return glm::normalize(glm::rotate(glm::quat(m_rotation), { 0.0f, 1.0f, 0.0f }));
+		return glm::normalize(glm::rotate(glm::quat(glm::radians(m_rotation)), { 0.0f, 1.0f, 0.0f }));
 	}
 
 	void Transform::updateModelMatrix() const

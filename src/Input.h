@@ -1,7 +1,7 @@
 #pragma once
 #include <GLFW/glfw3.h>
-#include <unordered_map>
 #include <glm/vec2.hpp>
+#include <unordered_map>
 
 class Input
 {

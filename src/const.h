@@ -2,14 +2,14 @@
 #include <glm/glm.hpp>
 namespace WINDOW
 {
-	constexpr int WIDTH = 800;
-	constexpr int HEIGHT = 600;
+	constexpr int WIDTH = 1600;
+	constexpr int HEIGHT = 900;
 }
 
-namespace TIME
-{
+//namespace TIME
+//{
 	constexpr float FIXED_DELTA_TIME = 1/60.0f;
-}
+//}
 
 namespace CAMERA
 {

@@ -1,24 +1,19 @@
 #include "Game.h"
 #include "const.h"
 #include "Log.h"
-#include "ObjectComponent/Camera.h"
 #include "Input.h"
-
-
-using namespace ObjectComponent;
+#include "GameTime.h"
+#include "BaseEditor.h"
 
 Game Game::s_singleton;
 
-Scene* Game::createScene()
+void Game::attachEditor(BaseEditor* editor)
 {
-	if (m_activeScene != nullptr)
-	{
-		m_activeScene->unload();
-	}
-	m_activeScene = std::make_unique<Scene>();
-	m_activeScene->load();
-	return m_activeScene.get();
+	m_editor = editor;
+	m_editor->onAttach();
 }
+
+
 
 void Game::setUp()
 {
@@ -38,12 +33,13 @@ void Game::runLoop()
 		m_lastFrameTime = frameTime;
 		m_accumulatedTime += m_deltaTime;
 
-		//processInput();
+		GameTime::setDeltaTime(m_deltaTime);
+		GameTime::setElapsedTime(GameTime::getElapsedTime() + m_deltaTime);
 
-		while (m_accumulatedTime >= TIME::FIXED_DELTA_TIME)
+		while (m_accumulatedTime >= FIXED_DELTA_TIME)
 		{
 			fixedUpdate();
-			m_accumulatedTime -= TIME::FIXED_DELTA_TIME;
+			m_accumulatedTime -= FIXED_DELTA_TIME;
 		}
 		update();
 		render();
@@ -102,6 +98,9 @@ bool Game::setUpRenderWindow()
 	glCullFace(GL_BACK);          // Discards back faces
 	glFrontFace(GL_CCW);          // counter clock wise is front
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	return true;
 }
 
@@ -113,14 +112,13 @@ void Game::disposeRenderWindow()
 void Game::onWindowResize(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-	if (Camera* camera = s_singleton.m_activeScene->getActiveCamera())
-		camera->setAspectRatio((float)width / (float)height);
+	Game::get().m_activeScene->onWindowResize(width, height);
 }
 
 void Game::update()
 {
-	if (m_editor) m_editor->update(m_deltaTime);
-	m_activeScene->update(m_deltaTime);
+	if (m_editor) m_editor->update();
+	m_activeScene->update();
 	Input::update();
 }
 

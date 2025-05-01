@@ -1,8 +1,8 @@
 #include "Game.h"
-
+#include "ObjectComponent/Editor.h"
 int main()
 {
-	Editor editor;
+	ObjectComponent::Editor editor;
 	Game::get().setUp();
 	Game::get().attachEditor(&editor);
 	Game::get().runLoop();

@@ -1,5 +1,6 @@
 #include "Input.h"
 #include "const.h"
+#include "GameTime.h"
 
 std::unordered_map<int, bool> Input::currentKeys;
 std::unordered_map<int, bool> Input::previousKeys;
@@ -90,6 +91,11 @@ void Input::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 	mousePosition = { (float)xpos, (float)ypos };
 	mouseDelta =  mousePosition - lastMousePosition;
 	mouseDelta.y *= -1;
+	float deltaTime = GameTime::getDeltaTime(true);
+	if (deltaTime > 0.0f)
+	{
+		mouseDelta /= deltaTime;
+	}
 	lastMousePosition = mousePosition;
 }
 

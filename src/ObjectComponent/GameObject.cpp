@@ -7,14 +7,12 @@ namespace ObjectComponent
 {
 	GameObject::GameObject(Scene* scene) : m_scene(scene), m_tag("Unnamed")
 	{
-		LOG("GameObject created!");
 		m_components.push_back(std::make_unique<Transform>(this));
 		m_transform = static_cast<Transform*>(m_components[0].get());
 	}
 
 	GameObject::GameObject(Scene* scene, const std::string& tag) : m_scene(scene), m_tag(tag)
 	{
-		LOG("GameObject created!");
 		m_components.push_back(std::make_unique<Transform>(this));
 		m_transform = static_cast<Transform*>(m_components[0].get());
 	}

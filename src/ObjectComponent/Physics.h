@@ -20,7 +20,7 @@ namespace ObjectComponent
         //}
 
         void initialize();
-        void fixedUpdate();
+        void fixedUpdate(float timeStep);
         void addRigidbody(Rigidbody* rigidbody);
         void removeRigidbody(Rigidbody* rigidbody);
 

@@ -1,6 +1,8 @@
 #include "Scene.h"
 #include "MeshRenderer.h"
 #include "Rigidbody.h"
+#include "GameTime.h"
+
 namespace ObjectComponent
 {
 	void Scene::load()
@@ -12,13 +14,13 @@ namespace ObjectComponent
 	{
 	}
 
-	void Scene::update(float deltaTime)
+	void Scene::update()
 	{
 	}
 
 	void Scene::fixedUpdate()
 	{
-		m_physics.fixedUpdate();
+		m_physics.fixedUpdate(GameTime::getFixedDeltaTime());
 	}
 
 	void Scene::render()
@@ -41,6 +43,12 @@ namespace ObjectComponent
 			if (meshRenderer != nullptr && meshRenderer->getEnabled())
 				meshRenderer->render(viewProjection);
 		}
+	}
+
+	void Scene::onWindowResize(int width, int height)
+	{
+		if (m_activeCamera)
+			m_activeCamera->setAspectRatio((float)width / (float)height);
 	}
 
 	GameObject* Scene::createGameObject()

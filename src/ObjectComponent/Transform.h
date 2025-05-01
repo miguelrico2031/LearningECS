@@ -29,6 +29,8 @@ namespace ObjectComponent
 		void setRotation(glm::vec3 rotation) { m_rotation = rotation; m_dirty = true; }
 		void setScale(glm::vec3 scale) { m_scale = scale; m_dirty = true; }
 
+		void translate(glm::vec3 translation) { m_position += translation; m_dirty = true; }
+
 	private:
 		glm::vec3 m_position = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_rotation = { 0.0f, 0.0f, 0.0f };

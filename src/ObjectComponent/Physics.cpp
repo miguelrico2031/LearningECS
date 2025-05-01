@@ -1,6 +1,5 @@
 #include "Physics.h"
 #include "ObjectComponent/Rigidbody.h"
-#include "const.h"
 
 namespace ObjectComponent
 {
@@ -15,14 +14,14 @@ namespace ObjectComponent
         m_dynamicsWorld->setGravity(btVector3(0, -9.81f, 0));
     }
 
-    void Physics::fixedUpdate()
+    void Physics::fixedUpdate(float timeStep)
     {
         for (Rigidbody* rigidbody : m_rigidbodies)
         {
             rigidbody->updateRigidbodyBeforeStep();
         }
         // Step the simulation
-        m_dynamicsWorld->stepSimulation(TIME::FIXED_DELTA_TIME, 10);
+        m_dynamicsWorld->stepSimulation(timeStep, 10);
 
         // Sync all rigidbodies with their transforms
         for (Rigidbody* rigidbody : m_rigidbodies)
