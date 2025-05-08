@@ -2,30 +2,30 @@
 #include <glm/glm.hpp>
 namespace WINDOW
 {
-	constexpr int WIDTH = 1600;
-	constexpr int HEIGHT = 900;
+	inline constexpr int WIDTH = 1600;
+	inline constexpr int HEIGHT = 900;
 }
 
 //namespace TIME
 //{
-	constexpr float FIXED_DELTA_TIME = 1/60.0f;
+	inline constexpr float FIXED_DELTA_TIME = 1/60.0f;
 //}
 
 namespace CAMERA
 {
-	constexpr float V_FOV_DEGREES = 45.0f;
-	constexpr float NEAR = 0.1f;
-	constexpr float FAR = 1000.0f;
-	constexpr float ORTHO_SIZE = 10.0f;
-	const glm::vec4 CLEAR_COLOR = { 0.2f, 0.0f, 0.1f, 1.0f };
+	inline constexpr float V_FOV_DEGREES = 45.0f;
+	inline constexpr float NEAR = 0.1f;
+	inline constexpr float FAR = 1000.0f;
+	inline constexpr float ORTHO_SIZE = 10.0f;
+	inline const glm::vec4 CLEAR_COLOR = { 0.2f, 0.0f, 0.1f, 1.0f };
 }
 
 namespace SHADER
 {
-	constexpr char* MODEL_VIEW_PROJ = "modelViewProj";
+	inline const char* MODEL_VIEW_PROJ = "modelViewProj";
 }
 
 namespace TEXTURE
 {
-	constexpr char* NO_TEX_PATH = "../assets/textures/notex.png";
+	inline const char* NO_TEX_PATH = "../assets/textures/notex.png";
 }
