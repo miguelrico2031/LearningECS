@@ -6,7 +6,7 @@ namespace ECS
 	template<class Component_T>
 	static ComponentType registerComponentType()
 	{
-		ComponentsManager::registerComponentType<Component_T>();
+		return ComponentsManager::registerComponentType<Component_T>();
 	}
 
 	template<class ...Component_T>
@@ -65,8 +65,8 @@ namespace ECS
 	* scene.reg.initialize(); ALWAYS initialize the registry after registering all the component types, NEVER before
 	* 
 	* //systems registration
-	* C2System& c2System = scene.reg.addSystem<C2System>();
-	* 
+	* C2System* c2SystemPtr = scene.reg.addSystem<C2System>();
+	* C2System& c2System = *c2SystemPtr;
 	* 
 	* ECS::Entity entity1 = scene.reg.createEntity();
 	* scene.reg.addComponent<Component1>(entity1, { 1, 2 });

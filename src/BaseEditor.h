@@ -1,11 +1,16 @@
 #pragma once
+#include "Instrumentalization.h"
 
 class BaseEditor
 {
 public:
-	virtual void onAttach() = 0;
-	virtual void update() = 0;
-	virtual void fixedUpdate() = 0;
 	virtual ~BaseEditor() = default;
+	virtual void onAttach();
+	virtual void update();
+	virtual void fixedUpdate() {}
+protected:
+	Instrumentalization::FPSCounter m_fpsCounter;
+	Instrumentalization::EventTimer m_closeGameTimer;
 
 };
+

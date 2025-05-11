@@ -36,7 +36,6 @@ namespace ObjectComponent
 		//bulletTransform.setFromOpenGLMatrix(glm::value_ptr(modelMatrix));
 
 		bulletTransform.setOrigin(btVector3(transform->getPosition().x, transform->getPosition().y, transform->getPosition().z));
-		auto og = bulletTransform.getOrigin();
 		glm::vec3 rotRadians = glm::radians(transform->getRotation());
 		btQuaternion quat;
 		quat.setEulerZYX(rotRadians.z, rotRadians.y, rotRadians.x),

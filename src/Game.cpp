@@ -55,6 +55,11 @@ void Game::dispose()
 
 }
 
+void Game::quit()
+{
+	glfwSetWindowShouldClose(m_window, true);
+}
+
 bool Game::setUpRenderWindow()
 {
 	// init and configure GLFW

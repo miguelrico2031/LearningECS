@@ -1,4 +1,5 @@
 #include "SystemsManager.h"
+#include "Registry.h"
 
 namespace ECS
 {
@@ -25,6 +26,12 @@ namespace ECS
 		}
 	}
 
+
+	void SystemsManager::setSystemRegistry(System* system, Registry* reg)
+	{
+		system->m_registry = reg;
+
+	}
 
 	void SystemsManager::addEntityToSystemInOrder(Entity entity, System& system)
 	{

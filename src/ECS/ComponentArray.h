@@ -31,7 +31,12 @@ namespace ECS
 
 		//returns garbage if entity doesn't have component
 		//therefore ComponentMask check is needed before calling get()
-		Component_T& get(Entity entity) const 
+		Component_T& get(Entity entity) 
+		{
+			return m_components[entity];
+		}
+
+		const Component_T& get(Entity entity) const
 		{
 			return m_components[entity];
 		}

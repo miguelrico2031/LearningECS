@@ -40,6 +40,8 @@ public:
 	void runLoop();
 	void dispose();
 
+	void quit();
+
 
 private:
 	static Game s_singleton;

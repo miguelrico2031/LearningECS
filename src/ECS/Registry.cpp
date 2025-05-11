@@ -9,8 +9,20 @@ namespace ECS
 	}
 	void Registry::destroyEntity(Entity entity)
 	{
+		ComponentMask mask = getComponentMask(entity);
+		for (size_t i = 0; i < MAX_COMPONENTS; i++)
+		{
+			if(mask.test(i))
+			{
+				ComponentMask oldMask = mask;
+				mask.set(i, false);
+				m_entitiesManager.setComponentMask(entity, mask);
+				m_componentsManager.removeComponent(entity, i);
+				m_systemsManager.onComponentRemoved(entity, oldMask);
+			}
+		}
+
 		m_entitiesManager.destroyEntity(entity);
-		//TODO: remove entity from all systems with matching component mask
 	}
 
 	ComponentMask Registry::getComponentMask(Entity entity) const

@@ -11,12 +11,12 @@ namespace ECS
 		Entity entity = NULL_ENTITY;
 		if (m_availables.empty())
 		{
-			Entity entity = m_nextEntity++;
+			entity = m_nextEntity++;
 			
 		}
 		else
 		{
-			Entity entity = m_availables.front();
+			entity = m_availables.front();
 			m_availables.pop();
 			m_entityData[entity].m_componentMask.reset();
 		}

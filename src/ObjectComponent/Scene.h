@@ -32,7 +32,6 @@ namespace ObjectComponent
 		std::vector<std::unique_ptr<GameObject>> m_gameObjects;
 		std::vector<Camera*> m_cameras;
 		Camera* m_activeCamera = nullptr;
-	public:
 		Physics m_physics;
 
 	private:

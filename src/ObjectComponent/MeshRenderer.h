@@ -1,8 +1,8 @@
 #pragma once
 #include "Component.h"
 #include "Transform.h"
-#include "Mesh.h"
-#include "Material.h"
+#include "Rendering/Mesh.h"
+#include "Rendering/Material.h"
 #include "const.h"
 #include <memory>
 
@@ -23,7 +23,6 @@ namespace ObjectComponent
 		inline void setMaterial(std::shared_ptr<Material> material)
 		{
 			m_material = material;
-			m_modelViewProjLocation = glGetUniformLocation(m_material->getShader().getID(), SHADER::MODEL_VIEW_PROJ);
 		}
 
 		void render(glm::mat4 viewProjectionMatrix)
@@ -31,18 +30,16 @@ namespace ObjectComponent
 			if (m_mesh == nullptr || m_material == nullptr)
 				return;
 
-			m_material->activate();
-
-			Shader& shader = m_material->getShader();
 			glm::mat4 modelViewProj = viewProjectionMatrix * m_gameObject->getTransform()->getModelMatrix();
-			shader.setMat4(m_modelViewProjLocation, modelViewProj);
-
+			m_material->activate();
+			m_material->setModelViewProjMatrix(modelViewProj);
+			m_mesh->bind();
 			m_mesh->render();
+			m_mesh->unbind();
 		}
 
 	private:
 		std::shared_ptr<Mesh> m_mesh = nullptr;
 		std::shared_ptr<Material> m_material = nullptr;
-		GLint m_modelViewProjLocation = -1;
 	};
 }

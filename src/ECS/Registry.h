@@ -4,6 +4,8 @@
 #include "ComponentsManager.h"
 #include "SystemsManager.h"
 
+#include "Event.h"
+
 namespace ECS
 {
 	class Registry
@@ -32,7 +34,7 @@ namespace ECS
 			assert(!mask.test(maskBit) && "Component already added to entity.");
 			mask.set(maskBit, true);
 			m_entitiesManager.setComponentMask(entity, mask);
-			m_componentsManager.addComponent(entity, component);
+			m_componentsManager.addComponent<Component_T>(entity, component);
 
 			m_systemsManager.onComponentAdded(entity, mask);
 		}
@@ -47,9 +49,11 @@ namespace ECS
 			ComponentMask oldMask = getComponentMask(entity);
 			ComponentMask mask = oldMask;
 			ComponentType maskBit = m_componentsManager.getComponentType<Component_T>();
-			assert(mask.test(maskBit) && "Entity donesn't have the component to remove.");
+			assert(mask.test(maskBit) && "Entity doesn't have the component to remove.");
 			mask.set(maskBit, false);
 			m_entitiesManager.setComponentMask(entity, mask);
+
+			m_componentsManager.removeComponent<Component_T>(entity);
 
 			m_systemsManager.onComponentRemoved(entity, oldMask);
 		}
@@ -66,7 +70,7 @@ namespace ECS
 
 
 		template<class Component_T>
-		Component_T& getComponent(Entity entity) const
+		const Component_T& getComponent(Entity entity) const
 		{
 			assert(IS_IN_RANGE(entity) && "Invalid entity to get component.");
 			assert(getIsAlive(entity) && "Cannot get component from dead entity.");
@@ -78,6 +82,33 @@ namespace ECS
 			return m_componentsManager.getComponent<Component_T>(entity);
 		}
 
+		template<class Component_T>
+		Component_T& getComponent(Entity entity)
+		{
+			assert(IS_IN_RANGE(entity) && "Invalid entity to get component.");
+			assert(getIsAlive(entity) && "Cannot get component from dead entity.");
+#ifndef NDEBUG
+			ComponentMask mask = getComponentMask(entity);
+			ComponentType maskBit = m_componentsManager.getComponentType<Component_T>();
+			assert(mask.test(maskBit) && "Entity doesn't have the component to get.");
+#endif 
+			return m_componentsManager.getComponent<Component_T>(entity);
+		}
+
+		template<class Component_T>
+		Event<Entity>& getComponentAddedEvent()
+		{
+			return m_componentsManager.getComponentAddedEvent<Component_T>();
+		}
+
+		template<class Component_T>
+		Event<Entity>& getComponentRemovedEvent()
+		{
+			return m_componentsManager.getComponentRemovedEvent<Component_T>();
+
+		}
+
+		/*
 		template<class Component_T>
 		bool tryGetComponent(Entity entity, Component_T* componentPtr) const
 		{
@@ -97,13 +128,15 @@ namespace ECS
 				return false;
 			}
 		}
+		*/
 #pragma endregion
 #pragma region SYSTEM
 		template<class System_T>
-		System_T& addSystem()
+		System_T* addSystem()
 		{
-			return m_systemsManager.addSystem<System_T>();
+			return m_systemsManager.addSystem<System_T>(this);
 		}
+#pragma endregion
 
 	private:
 		EntitiesManager m_entitiesManager;

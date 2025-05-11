@@ -4,7 +4,7 @@
 class ObjectComponentEditor : public BaseEditor
 {
 public:
-	void onAttach() override;
-	void update() override;
-	void fixedUpdate() override;
+	virtual void onAttach() override;
+	virtual void update() override;
+	virtual void fixedUpdate() override;
 };

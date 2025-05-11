@@ -4,6 +4,7 @@
 
 namespace ECS
 {
+	class Registry;
 	class System
 	{
 		friend class SystemsManager;
@@ -15,9 +16,11 @@ namespace ECS
 		{
 			return m_orderedEntities;
 		}
+	protected:
+		Registry* m_registry = nullptr;
 	private:
-		ComponentMask m_mask;
 		std::vector<Entity> m_orderedEntities;
+		ComponentMask m_mask;
 	};
 
 }

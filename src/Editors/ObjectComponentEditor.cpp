@@ -4,11 +4,11 @@
 #include "Log.h"
 #include "GameTime.h"
 #include "Random.h"
+#include "Rendering/Primitives.h"
 #include "ObjectComponent/Scene.h"
 #include "ObjectComponent/Camera.h"
 #include "ObjectComponent/Transform.h"
 #include "ObjectComponent/MeshRenderer.h"
-#include "ObjectComponent/Primitives.h"
 #include "ObjectComponent/Physics.h"
 #include "ObjectComponent/Rigidbody.h"
 #include "ObjectComponent/Collider.h"
@@ -37,28 +37,23 @@ static Scene* scene = nullptr;
 
 void ObjectComponentEditor::onAttach()
 {
+	BaseEditor::onAttach();
+	m_fpsCounter.start("ObjectComponentEditor");
 	setUpTestScene();
 }
 
 
 void ObjectComponentEditor::update()
 {
-	static float counter = 0.0f;
-	static int frames = 0;
-	counter += GameTime::getDeltaTime(true);
-	frames++;
-	if (counter >= 1.0f)
-	{
-		LOG("FPS: " << frames);
-		counter = 0.0f;
-		frames = 0;
-	}
-
+	BaseEditor::update();
 	moveCamera();
 	rotateCamera();
 }
 
-void ObjectComponentEditor::fixedUpdate() {}
+void ObjectComponentEditor::fixedUpdate()
+{
+	BaseEditor::fixedUpdate();
+}
 
 
 
@@ -69,7 +64,7 @@ void setUpTestScene()
 	//camera
 	GameObject* cam = scene->createGameObject("Camera");
 	Camera* camera = cam->addComponent<Camera>();
-	cam->getTransform()->setPosition({ 0, 30, 30 });
+	cam->getTransform()->setPosition({ 0, 30, 45 });
 
 	createFloor();
 	createSpheres();
@@ -105,13 +100,13 @@ void createFloor()
 
 void createSpheres()
 {
-	const size_t N_SPHERES = 600;
+	const size_t N_SPHERES = 2500;
 	const glm::vec3 ORIGIN = { 0, 25, 0 };
 	const float SPREAD = 10.0f;
 
 	std::shared_ptr<Material> sphereMat = std::make_shared<Material>(
 		"../assets/shaders/basic.vert",
-		"../assets/shaders/basic.frag",
+		"../assets/shaders/basic.frag", 
 		"../assets/textures/laura.png");
 	std::shared_ptr<Mesh> sphereMesh = Primitives::createSphereMesh();
 
@@ -124,11 +119,10 @@ void createSpheres()
 		GameObject* sphere = scene->createGameObject("Sphere " + std::to_string(i));
 		Transform* transform = sphere->getTransform();
 		transform->setPosition(position);
-		//transform->setRotation({ 0, 90, -90 });
+		transform->setRotation({ 0, 90, -90 });
 		MeshRenderer* meshRenderer = sphere->addComponent<MeshRenderer>();
 		meshRenderer->setMesh(sphereMesh);
 		meshRenderer->setMaterial(sphereMat);
-
 		SphereCollider* sphereCol = sphere->addComponent<SphereCollider>();
 		sphereCol->setRadius(1.0f);
 		Rigidbody* rb = sphere->addComponent<Rigidbody>();
