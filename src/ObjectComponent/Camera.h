@@ -18,7 +18,7 @@ namespace ObjectComponent
 			m_verticalFOV(glm::radians(CAMERA::V_FOV_DEGREES)),
 			m_near(CAMERA::NEAR), m_far(CAMERA::FAR),
 			m_orthographicSize(CAMERA::ORTHO_SIZE),
-			m_clearColor(CAMERA::CLEAR_COLOR),
+			m_clearColor(CAMERA::CLEAR_COLOR_1),
 			m_projDirty(true)
 		{
 		}

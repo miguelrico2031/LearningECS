@@ -17,31 +17,15 @@
 
 using namespace ObjectComponent;
 
-static void setUpTestScene();
-static void createFloor();
-static void createSpheres();
-static void createBox();
-
-static void moveCamera();
-static void rotateCamera();
 
 
-static struct
+void ObjectComponentEditor::onAttach(Game& game)
 {
-	float speed = 5.0f;
-	float sensitivity = 0.05f;
-} cameraMoveParams;
-
-static Scene* scene = nullptr;
-
-
-void ObjectComponentEditor::onAttach()
-{
-	BaseEditor::onAttach();
-	m_fpsCounter.start("ObjectComponentEditor");
+	BaseEditor::onAttach(game);
+	m_fpsCounter.start("ObjectComponentEditor", "analysis/");
+	m_game = &game;
 	setUpTestScene();
 }
-
 
 void ObjectComponentEditor::update()
 {
@@ -56,24 +40,24 @@ void ObjectComponentEditor::fixedUpdate()
 }
 
 
-
-void setUpTestScene()
+void ObjectComponentEditor::setUpTestScene()
 {
-	scene = Game::get().createScene<Scene>();
+	m_scene = m_game->createScene<Scene>();
 
 	//camera
-	GameObject* cam = scene->createGameObject("Camera");
+	GameObject* cam = m_scene->createGameObject("Camera");
 	Camera* camera = cam->addComponent<Camera>();
 	cam->getTransform()->setPosition({ 0, 30, 45 });
+	camera->setClearColor(CAMERA::CLEAR_COLOR_2);
 
 	createFloor();
 	createSpheres();
 	createBox();
 }
 
-void createFloor()
+void ObjectComponentEditor::createFloor()
 {
-	GameObject* floor = scene->createGameObject("Floor");
+	GameObject* floor = m_scene->createGameObject("Floor");
 
 	Transform* floorTransform = floor->getTransform();
 	floorTransform->setRotation({ -90, 0, 0 });
@@ -81,9 +65,11 @@ void createFloor()
 
 	std::shared_ptr<Mesh> quadMesh = Primitives::createQuadMesh();
 	std::shared_ptr<Material> floorMat = std::make_shared<Material>(
-		"../assets/shaders/basic.vert",
-		"../assets/shaders/basic.frag");
-	floorMat->setColor({ 0.06f, 0.3f, 0.2f, 1.0f });
+		"assets/shaders/basic.vert",
+		"assets/shaders/basic.frag",
+		"assets/textures/wood.jpg");
+	floorMat->setColor({ 0.6f, 0.3f, 0.2f, 1.0f });
+	floorMat->setTiling(5);
 	MeshRenderer* meshRenderer = floor->addComponent<MeshRenderer>();
 	meshRenderer->setMesh(quadMesh);
 	meshRenderer->setMaterial(floorMat);
@@ -98,25 +84,22 @@ void createFloor()
 
 
 
-void createSpheres()
+void ObjectComponentEditor::createSpheres()
 {
-	const size_t N_SPHERES = 2500;
-	const glm::vec3 ORIGIN = { 0, 25, 0 };
-	const float SPREAD = 10.0f;
 
 	std::shared_ptr<Material> sphereMat = std::make_shared<Material>(
-		"../assets/shaders/basic.vert",
-		"../assets/shaders/basic.frag", 
-		"../assets/textures/laura.png");
+		"assets/shaders/basic.vert",
+		"assets/shaders/basic.frag", 
+		"assets/textures/metal.jpg");
 	std::shared_ptr<Mesh> sphereMesh = Primitives::createSphereMesh();
 
-	for (size_t i = 0; i < N_SPHERES; i++)
+	glm::vec3 origin = { m_params.m_spheresOrigin[0], m_params.m_spheresOrigin[1], m_params.m_spheresOrigin[2] };
+	
+	for (size_t i = 0; i < m_params.m_sphereCount; i++)
 	{
+		glm::vec3 position = origin + Random::pointInUnitSphere() * m_params.m_spheresSpread;
 
-		glm::vec3 position = ORIGIN + Random::pointInUnitSphere() * SPREAD;
-		position.y += 15;
-
-		GameObject* sphere = scene->createGameObject("Sphere " + std::to_string(i));
+		GameObject* sphere = m_scene->createGameObject("Sphere " + std::to_string(i));
 		Transform* transform = sphere->getTransform();
 		transform->setPosition(position);
 		transform->setRotation({ 0, 90, -90 });
@@ -132,11 +115,11 @@ void createSpheres()
 
 
 
-void createBox()
+void ObjectComponentEditor::createBox()
 {
 	std::shared_ptr<Material> boxMat = std::make_shared<Material>(
-		"../assets/shaders/basic.vert",
-		"../assets/shaders/basic.frag");
+		"assets/shaders/basic.vert",
+		"assets/shaders/basic.frag");
 	boxMat->setColor({ 1, 1, 1, 0.3f });
 
 	std::shared_ptr<Mesh> boxMesh = Primitives::createCubeMesh();
@@ -152,7 +135,7 @@ void createBox()
 	for (size_t i = 0; i < 5; i++)
 	{
 
-		GameObject* box = scene->createGameObject("Box" + std::to_string(i));
+		GameObject* box = m_scene->createGameObject("Box" + std::to_string(i));
 		Transform* boxTransform = box->getTransform();
 		boxTransform->setScale({ 20, 0.5f, 20 });
 		boxTransform->setPosition({ 0, 5, 0 });
@@ -175,14 +158,15 @@ void createBox()
 		boxRb->getBulletRigidbody()->setRestitution(0.75f);
 	}
 }
+
 #pragma region CAMERA
-void moveCamera()
+void ObjectComponentEditor::moveCamera()
 {
-	if (!scene || !scene->getActiveCamera())
+	if (!m_scene || !m_scene->getActiveCamera())
 		return;
 
 	glm::vec3 moveInput = { 0, 0, 0 };
-	float speed = cameraMoveParams.speed;
+	float speed = m_params.m_cameraMoveSpeed;
 
 	if (Input::isKeyHeld(GLFW_KEY_W))
 	{
@@ -210,12 +194,12 @@ void moveCamera()
 	}
 	if (Input::isKeyHeld(GLFW_KEY_LEFT_SHIFT))
 	{
-		speed *= 4;
+		speed = m_params.m_cameraSprintSpeed;
 	}
 
 	if (glm::length(moveInput) > 0.0f)
 	{
-		Transform* ct = scene->getActiveCamera()->getGameObject()->getTransform();
+		Transform* ct = m_scene->getActiveCamera()->getGameObject()->getTransform();
 		glm::vec3 movement = ct->getForward() * moveInput.y +
 			ct->getRight() * moveInput.x +
 			glm::vec3(0, 1, 0) * moveInput.z;
@@ -226,13 +210,13 @@ void moveCamera()
 	}
 }
 
-void rotateCamera()
+void ObjectComponentEditor::rotateCamera()
 {
-	if (!scene || !scene->getActiveCamera())
+	if (!m_scene || !m_scene->getActiveCamera())
 		return;
 	glm::vec2 offset = Input::getMouseDelta();
-	offset *= cameraMoveParams.sensitivity * GameTime::getDeltaTime();
-	Camera* camera = scene->getActiveCamera();
+	offset *= m_params.m_cameraSensitivity * GameTime::getDeltaTime();
+	Camera* camera = m_scene->getActiveCamera();
 	Transform* ct = camera->getGameObject()->getTransform();
 	glm::vec3 rot = ct->getRotation();
 	rot.y -= offset.x;

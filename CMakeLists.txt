@@ -41,6 +41,8 @@ add_custom_target(copy_assets ALL
 
 add_dependencies(LearningECS copy_assets)
 
+set_property(TARGET LearningECS PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>")
+
 
 
 # fetch and download glfw

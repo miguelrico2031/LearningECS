@@ -6,7 +6,7 @@ namespace ECS
 {
 	using Entity = uint32_t;
 	constexpr Entity NULL_ENTITY = 0;
-	constexpr Entity MAX_ENTITIES = 4096*2;
+	constexpr Entity MAX_ENTITIES = 4096;
 	using ComponentType = uint8_t;
 	constexpr ComponentType MAX_COMPONENTS = 32;
 	using ComponentMask = std::bitset<MAX_COMPONENTS>;

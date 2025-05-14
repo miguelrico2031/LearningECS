@@ -1,9 +1,12 @@
 #include "BaseEditor.h"
 #include "GameTime.h"
 #include "Game.h"
-void BaseEditor::onAttach()
+void BaseEditor::onAttach(Game& game)
 {
-	m_closeGameTimer.start(10.0f, []() { Game::get().quit(); });
+	if (m_params.m_simDurationSeconds >= 0)
+	{
+		m_closeGameTimer.start(m_params.m_simDurationSeconds, [&game]() { game.quit(); });
+	}
 }
 
 void BaseEditor::update()

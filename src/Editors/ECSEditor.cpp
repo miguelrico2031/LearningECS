@@ -16,23 +16,17 @@
 #include "ECSGame/Utils/PhysicsUtil.h"
 #include "ECSGame/Utils/TransformUtil.h"
 #include "ECSGame/Systems/FreeMovementSystem.h"
+#include <filesystem>
 
 using namespace ECSGame;
 
-static Scene* scene = nullptr;
-static FreeMovementSystem* freeMovementSystem = nullptr;
 
-static void initializeECSRegistry();
 
-static void setUpTestScene();
-static void createFloor();
-static void createSpheres();
-static void createBox();
-
-void ECSEditor::onAttach()
+void ECSEditor::onAttach(Game& game)
 {
-	BaseEditor::onAttach();
-	m_fpsCounter.start("ECSEditor");
+	m_game = &game;
+	BaseEditor::onAttach(game);
+	m_fpsCounter.start("ECSEditor", "analysis/");
 	initializeECSRegistry();
 	setUpTestScene();
 }
@@ -40,7 +34,7 @@ void ECSEditor::onAttach()
 void ECSEditor::update()
 {
 	BaseEditor::update();
-	freeMovementSystem->update();
+	m_freeMovementSystem->update();
 }
 
 void ECSEditor::fixedUpdate()
@@ -48,108 +42,110 @@ void ECSEditor::fixedUpdate()
 	BaseEditor::fixedUpdate();
 }
 
-void initializeECSRegistry()
+void ECSEditor::initializeECSRegistry()
 {
 	//custom components registration
 	ECS::registerComponentType<FreeMovement>();
 
 	//registry initialization
-	scene = Game::get().createScene<Scene>();
+	m_scene = m_game->createScene<Scene>();
 
 	//custom systems registration
-	freeMovementSystem = scene->getRegistry().addSystem<FreeMovementSystem>();
+	m_freeMovementSystem = m_scene->getRegistry().addSystem<FreeMovementSystem>();
 }
 
 
-void setUpTestScene()
+void ECSEditor::setUpTestScene()
 {
-	ECS::Entity cameraEntity = scene->getRegistry().createEntity();
+	ECS::Registry& reg = m_scene->getRegistry();
+	ECS::Entity cameraEntity = reg.createEntity();
 	Transform cameraTransform = { {0, 30, 45} };
-	scene->getRegistry().addComponent<Transform>(cameraEntity, cameraTransform);
-	scene->getRegistry().addComponent<Camera>(cameraEntity, {});
-	scene->getRegistry().addComponent<FreeMovement>(cameraEntity, { 5.0f, 25.0f, 0.04f });
-
-	/*
-	ECS::Entity cubeEntity = scene->getRegistry().createEntity();
-	scene->getRegistry().addComponent<Transform>(cubeEntity, {});
-	std::shared_ptr<Mesh> cubeMesh = Primitives::createCubeMesh();
-	std::shared_ptr<Material> floorMat = std::make_shared<Material>(
-		"../assets/shaders/basic.vert",
-		"../assets/shaders/basic.frag",
-		"../assets/textures/stratum.png");
-	scene->getRegistry().addComponent<MeshRenderer>(cubeEntity, { cubeMesh, floorMat });
-	*/
+	reg.addComponent<Transform>(cameraEntity, cameraTransform);
+	reg.addComponent<Camera>(cameraEntity, {});
+	reg.addComponent<FreeMovement>(cameraEntity, 
+		{ m_params.m_cameraMoveSpeed, m_params.m_cameraSprintSpeed, m_params.m_cameraSensitivity });
 
 	createFloor();
 	createSpheres();
 	createBox();
 }
 
-void createFloor()
+void ECSEditor::createFloor()
 {
-	ECS::Entity floorEntity = scene->getRegistry().createEntity();
+	ECS::Registry& reg = m_scene->getRegistry();
+	ECS::Entity floorEntity = reg.createEntity();
 	Transform floorTransform =
 	{
 		{ 0.0f, 0.0f, 0.0f }, //pos
 		{ -90.0f, 0.0f, 0.0f }, //rot
 		{ 100.0f, 100.0f, 0.1f } //scale
 	};
-	scene->getRegistry().addComponent<Transform>(floorEntity, floorTransform);
+	reg.addComponent<Transform>(floorEntity, floorTransform);
 	std::shared_ptr<Mesh> quadMesh = Primitives::createQuadMesh();
 	std::shared_ptr<Material> floorMat = std::make_shared<Material>(
-		"../assets/shaders/basic.vert",
-		"../assets/shaders/basic.frag");
+		"assets/shaders/basic.vert",
+		"assets/shaders/basic.frag",
+		"assets/textures/wood.jpg");
 	floorMat->setColor({ 0.6f, 0.3f, 0.2f, 1.0f });
-	scene->getRegistry().addComponent<MeshRenderer>(floorEntity, { quadMesh, floorMat });
+	floorMat->setTiling(5);
+	reg.addComponent<MeshRenderer>(floorEntity, { quadMesh, floorMat });
 
-	scene->getRegistry().addComponent<Collider>(floorEntity, { Collider::Type::Box });
+	reg.addComponent<Collider>(floorEntity, { Collider::Type::Box });
 	PhysicsUtil::setBoxColliderHalfExtents(
-		scene->getRegistry().getComponent<Collider>(floorEntity),
+		reg.getComponent<Collider>(floorEntity),
 		floorTransform.m_scale * 0.5f);
-	scene->getRegistry().addComponent<Rigidbody>(floorEntity, {});
-	Rigidbody& floorRb = scene->getRegistry().getComponent<Rigidbody>(floorEntity);
+	reg.addComponent<Rigidbody>(floorEntity, {});
+	Rigidbody& floorRb = reg.getComponent<Rigidbody>(floorEntity);
 	PhysicsUtil::setRigidbodyMass(floorRb, 0.0f); //make it static
 	PhysicsUtil::setRigidbodyRestitution(floorRb, 0.75f);
 }
 
-void createSpheres()
+void ECSEditor::createSpheres()
 {
-	const size_t N_SPHERES = 2500;
-	const glm::vec3 ORIGIN = { 0, 25, 0 };
-	const float SPREAD = 10.0f;
+	ECS::Registry& reg = m_scene->getRegistry();
+
+	//const size_t N_SPHERES = 2500;
+	//const glm::vec3 ORIGIN = { 0, 40, 0 };
+	//const float SPREAD = 10.0f;
+
 	std::shared_ptr<Material> sphereMat = std::make_shared<Material>(
-		"../assets/shaders/basic.vert",
-		"../assets/shaders/basic.frag",
-		"../assets/textures/laura.png");
+		"assets/shaders/basic.vert",
+		"assets/shaders/basic.frag",
+		"assets/textures/metal.jpg");
+	sphereMat->setTiling(2);
 	std::shared_ptr<Mesh> sphereMesh = Primitives::createSphereMesh();
-	for (size_t i = 0; i < N_SPHERES; i++)
+
+	glm::vec3 origin = { m_params.m_spheresOrigin[0], m_params.m_spheresOrigin[1], m_params.m_spheresOrigin[2] };
+
+	for (size_t i = 0; i < m_params.m_sphereCount; i++)
 	{
 		Transform sphereTransform;
-		sphereTransform.m_position = ORIGIN + Random::pointInUnitSphere() * SPREAD;
-		sphereTransform.m_position.y += 15;
+		sphereTransform.m_position = origin + Random::pointInUnitSphere() * m_params.m_spheresSpread;
 		sphereTransform.m_rotation = { 0, 90, -90 };
 
-		ECS::Entity sphereEntity = scene->getRegistry().createEntity();
-		scene->getRegistry().addComponent<Transform>(sphereEntity, sphereTransform);
-		scene->getRegistry().addComponent<MeshRenderer>(sphereEntity, { sphereMesh, sphereMat });
+		ECS::Entity sphereEntity = reg.createEntity();
+		reg.addComponent<Transform>(sphereEntity, sphereTransform);
+		reg.addComponent<MeshRenderer>(sphereEntity, { sphereMesh, sphereMat });
 
-		scene->getRegistry().addComponent<Collider>(sphereEntity, { Collider::Type::Sphere });
+		reg.addComponent<Collider>(sphereEntity, { Collider::Type::Sphere });
 		PhysicsUtil::setSphereColliderRadius(
-			scene->getRegistry().getComponent<Collider>(sphereEntity),
+			reg.getComponent<Collider>(sphereEntity),
 			1.0f);
-		scene->getRegistry().addComponent<Rigidbody>(sphereEntity, {});
-		Rigidbody& rb = scene->getRegistry().getComponent<Rigidbody>(sphereEntity);
+		reg.addComponent<Rigidbody>(sphereEntity, {});
+		Rigidbody& rb = reg.getComponent<Rigidbody>(sphereEntity);
 		PhysicsUtil::setRigidbodyMass(rb, 1.0f);
 		PhysicsUtil::setRigidbodyRestitution(rb, 0.75f);
 	}
 }
 
-void createBox()
+void ECSEditor::createBox()
 {
+	ECS::Registry& reg = m_scene->getRegistry();
+
 	std::shared_ptr<Mesh> boxMesh = Primitives::createCubeMesh();
 	std::shared_ptr<Material> boxMat = std::make_shared<Material>(
-		"../assets/shaders/basic.vert",
-		"../assets/shaders/basic.frag");
+		"assets/shaders/basic.vert",
+		"assets/shaders/basic.frag");
 	boxMat->setColor({ 1, 1, 1, 0.3f });
 	glm::vec3 boxRotations[] =
 	{
@@ -162,7 +158,7 @@ void createBox()
 	for (size_t i = 0; i < 5; i++)
 	{
 
-		ECS::Entity boxEntity = scene->getRegistry().createEntity();
+		ECS::Entity boxEntity = reg.createEntity();
 		Transform boxTransform;
 		boxTransform.m_position = { 0.0f, 5.0f, 0.0f };
 		boxTransform.m_rotation = boxRotations[i];
@@ -172,15 +168,15 @@ void createBox()
 			boxTransform.m_position += glm::vec3{ 0, 10, 0 } + TransformUtil::getUp(boxTransform) * 10.0f;
 		}
 
-		scene->getRegistry().addComponent<Transform>(boxEntity, boxTransform);
-		scene->getRegistry().addComponent<MeshRenderer>(boxEntity, { boxMesh, boxMat });
+		reg.addComponent<Transform>(boxEntity, boxTransform);
+		reg.addComponent<MeshRenderer>(boxEntity, { boxMesh, boxMat });
 
-		scene->getRegistry().addComponent<Collider>(boxEntity, { Collider::Type::Box });
+		reg.addComponent<Collider>(boxEntity, { Collider::Type::Box });
 		PhysicsUtil::setBoxColliderHalfExtents(
-			scene->getRegistry().getComponent<Collider>(boxEntity),
+			reg.getComponent<Collider>(boxEntity),
 			boxTransform.m_scale * 0.5f);
-		scene->getRegistry().addComponent<Rigidbody>(boxEntity, {});
-		Rigidbody& boxRb = scene->getRegistry().getComponent<Rigidbody>(boxEntity);
+		reg.addComponent<Rigidbody>(boxEntity, {});
+		Rigidbody& boxRb = reg.getComponent<Rigidbody>(boxEntity);
 		PhysicsUtil::setRigidbodyMass(boxRb, 0.0f); //static
 		PhysicsUtil::setRigidbodyRestitution(boxRb, 0.75f);
 	}

@@ -8,12 +8,13 @@ namespace Instrumentalization
 	class FPSCounter
 	{
 	public:
-		void start(const std::string& name = "Unnamed");
+		void start(const std::string& name = "Unnamed", const std::string& path = "./");
 
 		void update(float timeStep);
 		~FPSCounter();
 	private:
 		std::string m_name = "Unnamed";
+		std::string m_path = "./";
 		bool m_started = false;
 		float m_counter = 0.0f;
 		int m_frames = 0;

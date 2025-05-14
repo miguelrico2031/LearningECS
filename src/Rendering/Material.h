@@ -21,6 +21,11 @@ public:
 		m_shader.setVec4(m_colorUniformLocation, m_color);
 	}
 
+	inline void setTiling(float value)
+	{
+		m_shader.setFloat(m_tilingLocation, value);
+	}
+
 	void activate() const
 	{
 		m_shader.activate();
@@ -34,4 +39,5 @@ private:
 	GLint m_colorUniformLocation = -1;
 	GLint m_hasTextureUniformLocation = -1;
 	GLint m_modelViewProjLocation = -1;
+	GLint m_tilingLocation = -1;
 };

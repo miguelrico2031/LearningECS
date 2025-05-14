@@ -5,14 +5,13 @@
 #include "GameTime.h"
 #include "BaseEditor.h"
 
-Game Game::s_singleton;
+
 
 void Game::attachEditor(BaseEditor* editor)
 {
 	m_editor = editor;
-	m_editor->onAttach();
+	m_editor->onAttach(*this);
 }
-
 
 
 void Game::setUp()
@@ -51,8 +50,8 @@ void Game::runLoop()
 
 void Game::dispose()
 {
-	disposeRenderWindow();
-
+	glfwTerminate();
+	m_window = nullptr;
 }
 
 void Game::quit()
@@ -71,7 +70,7 @@ bool Game::setUpRenderWindow()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 	glfwWindowHint(GLFW_DEPTH_BITS, 24);
-
+	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
 	// create a window object
 	m_window = glfwCreateWindow(WINDOW::WIDTH, WINDOW::HEIGHT, "LearningECS", NULL, NULL);
@@ -92,8 +91,12 @@ bool Game::setUpRenderWindow()
 
 	//configure rendering window size and resize callback
 	glViewport(0, 0, WINDOW::WIDTH, WINDOW::HEIGHT);
-	glfwSetFramebufferSizeCallback(m_window, onWindowResize);
-
+	glfwSetWindowUserPointer(m_window, this);
+	glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height)
+		{
+		Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
+		game->onWindowResize(window, width, height);
+		});
 
 	//config OpenGL options
 	glEnable(GL_DEPTH_TEST);
@@ -109,15 +112,11 @@ bool Game::setUpRenderWindow()
 	return true;
 }
 
-void Game::disposeRenderWindow()
-{
-	glfwTerminate();
-}
 
 void Game::onWindowResize(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-	Game::get().m_activeScene->onWindowResize(width, height);
+	m_activeScene->onWindowResize(width, height);
 }
 
 void Game::update()

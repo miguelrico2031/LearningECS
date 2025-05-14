@@ -41,10 +41,10 @@ void Mesh::setupMesh(const std::vector<float>& vertices, const std::vector<unsig
 	glVertexAttribPointer(positionAttributeLocation, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*)0);
 	glEnableVertexAttribArray(positionAttributeLocation); //enable the attribute
 
-	//color attribute:
-	GLuint colorAttributeLocation = 1u;  //the location specificated in the vertex shader
-	glVertexAttribPointer(colorAttributeLocation, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(colorAttributeLocation); //enable the attribute
+	//normal attribute:
+	GLuint normalAttributeLocation = 1u;  //the location specificated in the vertex shader
+	glVertexAttribPointer(normalAttributeLocation, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(normalAttributeLocation); //enable the attribute
 
 
 	//uv attribute:

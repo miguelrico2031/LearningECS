@@ -7,7 +7,7 @@ namespace ECSGame
 	struct Camera
 	{
 		mutable glm::mat4 m_projMatrix = {};
-		glm::vec4 m_clearColor = CAMERA::CLEAR_COLOR;
+		glm::vec4 m_clearColor = CAMERA::CLEAR_COLOR_1;
 		float m_aspectRatio = (float)WINDOW::WIDTH / (float)WINDOW::HEIGHT;
 		float m_verticalFOV = glm::radians(CAMERA::V_FOV_DEGREES);
 		float m_near = CAMERA::NEAR;

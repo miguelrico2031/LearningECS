@@ -11,11 +11,7 @@ class BaseEditor;
 class Game
 {
 public:
-
-	inline static Game& get()
-	{
-		return s_singleton;
-	}
+	Game() {}
 
 	inline BaseScene* getScene() const { return m_activeScene.get(); }
 	inline GLFWwindow* getWindow() const { return m_window; }
@@ -42,26 +38,20 @@ public:
 
 	void quit();
 
-
 private:
-	static Game s_singleton;
-	GLFWwindow* m_window = nullptr; //TODO: could be unique_ptr ??
-
-	std::unique_ptr<BaseScene> m_activeScene = nullptr;
-
-	BaseEditor* m_editor = nullptr;
-
-
-	float m_deltaTime = 0.0f, m_lastFrameTime = 0.0f, m_accumulatedTime = 0.0f;
-private:
-	Game() {}
 	Game(const Game& g) = delete;
 	bool setUpRenderWindow();
-	void disposeRenderWindow();
-	static void onWindowResize(GLFWwindow* window, int width, int height);
+	void onWindowResize(GLFWwindow* window, int width, int height);
 
 	void update();
 	void fixedUpdate();
 	void render();
+
+private:
+	GLFWwindow* m_window = nullptr; //TODO: could be unique_ptr ??
+	std::unique_ptr<BaseScene> m_activeScene = nullptr;
+	BaseEditor* m_editor = nullptr;
+	float m_deltaTime = 0.0f, m_lastFrameTime = 0.0f, m_accumulatedTime = 0.0f;
+
 
 };
