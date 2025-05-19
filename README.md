@@ -47,6 +47,7 @@ The [`main.cpp`](https://github.com/miguelrico2031/LearningECS/blob/main/src/mai
 
 
 ## Results
+![Demo](readme_media/demo.gif/)
 The [`analysis.py`](https://github.com/miguelrico2031/LearningECS/blob/main/analysis/analysis.py) file reads the performance test results, stored in JSON files, and compares them to identify the percentage improvement in average FPS of ECS over Object-Component.
 
 After running the simulations 100 times, the results showed that the ECS implementation had an average FPS 9.5% higher than the Object-Component implementation. This improvement is negligible, and is mainly due to the fact that the physics components in ECS are merely wrappers around Bullet objects pointers (`btRigidBody` and `btCollisionShape`), meaning that memory indirection still occurs.
