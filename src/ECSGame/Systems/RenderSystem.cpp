@@ -40,7 +40,7 @@ namespace ECSGame
 	}
 
 
-	bool RenderCameraParamsSystem::getRenderCameraParams(glm::mat4& viewProjMatrix, glm::vec4& clearColor) const
+	bool CameraSystem::getRenderCameraParams(glm::mat4& viewProjMatrix, glm::vec4& clearColor) const
 	{
 		if (getEntities().empty())
 			return false;
@@ -60,6 +60,15 @@ namespace ECSGame
 		viewProjMatrix = camera.m_projMatrix * view;
 		clearColor = camera.m_clearColor;
 		return true;
+	}
+
+	void CameraSystem::updateAspectRatio(float aspectRatio)
+	{
+		for (ECS::Entity e : getEntities())
+		{
+			Camera& camera = m_registry->getComponent<Camera>(e);
+			camera.m_aspectRatio = aspectRatio;
+		}
 	}
 
 }

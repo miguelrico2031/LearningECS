@@ -15,11 +15,13 @@ namespace ECSGame
 		void render(glm::mat4 viewProjMatrix, glm::vec4 clearColor) const;
 	};
 
-	class RenderCameraParamsSystem : public ECS::System
+	class CameraSystem : public ECS::System
 	{
 	public:
-		RenderCameraParamsSystem() : ECS::System(ECS::getMask<Transform, Camera>()) {}
+		CameraSystem() : ECS::System(ECS::getMask<Transform, Camera>()) {}
 
 		bool getRenderCameraParams(glm::mat4& viewProjMatrix, glm::vec4& clearColor) const;
+
+		void updateAspectRatio(float aspectRatio);
 	};
 }

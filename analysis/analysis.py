@@ -4,12 +4,10 @@ import json
 def read_jsons_from_directory(ruta_carpeta):
     datos = []
 
-    # Verifica si la ruta existe y es una carpeta
     if not os.path.isdir(ruta_carpeta):
         print(f"La ruta '{ruta_carpeta}' no es válida.")
         return datos
 
-    # Itera sobre todos los archivos de la carpeta
     for nombre_archivo in os.listdir(ruta_carpeta):
         if nombre_archivo.endswith(".json"):
             ruta_archivo = os.path.join(ruta_carpeta, nombre_archivo)
@@ -22,8 +20,9 @@ def read_jsons_from_directory(ruta_carpeta):
 
     return datos
 
-ecspath = "analysis_ecs"
-ocpath = "analysis_oc"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+ecspath = os.path.join(script_dir, "analysis_ecs")
+ocpath = os.path.join(script_dir, "analysis_oc")
 ecsdata = read_jsons_from_directory(ecspath)
 ocdata = read_jsons_from_directory(ocpath)
 
@@ -40,6 +39,6 @@ ecs_total_avg /= count
 oc_total_avg /= count
 ecs_improvement = (ecs_total_avg * 100 / oc_total_avg) - 100
 
-print(f"Media total de FPS en {count} simulaciones usando POO y composición (similar a Unity): {oc_total_avg:.2f}")
-print(f"Media total de FPS en {count} simulaciones usando ECS: {ecs_total_avg:.2f}")
-print(f"mejora de ECS respecto a POO: {ecs_improvement:.2f}%")
+print(f"Total average FPS in {count} simulations using an Object-Component architecture: {oc_total_avg:.2f}")
+print(f"Total average FPS in {count} simulations using an ECS architecture: {ecs_total_avg:.2f}")
+print(f"ECS improvement over Object-Component: {ecs_improvement:.2f}%")

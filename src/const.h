@@ -2,8 +2,8 @@
 #include <glm/glm.hpp>
 namespace WINDOW
 {
-	inline constexpr int WIDTH = 1600;
-	inline constexpr int HEIGHT = 900;
+	inline constexpr int WIDTH = 1000;
+	inline constexpr int HEIGHT = 800;
 }
 
 

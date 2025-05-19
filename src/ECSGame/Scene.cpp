@@ -22,7 +22,7 @@ namespace ECSGame
 		Scene::registerAllComponentTypes();
 		m_registry.initialize();
 
-		m_renderCameraParamsSystem = m_registry.addSystem<RenderCameraParamsSystem>();
+		m_cameraSystem = m_registry.addSystem<CameraSystem>();
 		m_renderSystem = m_registry.addSystem<RenderSystem>();
 
 		m_physicsSystem = m_registry.addSystem<PhysicsSystem>();
@@ -46,7 +46,7 @@ namespace ECSGame
 	{
 		glm::mat4 viewProjectionMatrix;
 		glm::vec4 clearColor;
-		bool cameraExists = m_renderCameraParamsSystem->getRenderCameraParams(viewProjectionMatrix, clearColor);
+		bool cameraExists = m_cameraSystem->getRenderCameraParams(viewProjectionMatrix, clearColor);
 
 		if (!cameraExists)
 		{
@@ -60,6 +60,7 @@ namespace ECSGame
 
 	void Scene::onWindowResize(int width, int height)
 	{
+		m_cameraSystem->updateAspectRatio((float)width / (float)height);
 	}
 
 
@@ -74,7 +75,6 @@ namespace ECSGame
 		ECS::registerComponentType<MeshRenderer>();
 		ECS::registerComponentType<Collider>();
 		ECS::registerComponentType<Rigidbody>();
-
 
 		done = true;
 	}

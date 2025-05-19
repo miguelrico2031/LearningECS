@@ -5,7 +5,7 @@
 namespace ECSGame
 {
 	class RenderSystem;
-	class RenderCameraParamsSystem;
+	class CameraSystem;
 	class PhysicsSystem;
 	class Scene : public BaseScene
 	{
@@ -24,7 +24,7 @@ namespace ECSGame
 		virtual void onWindowResize(int width, int height) override;
 	private:
 		ECS::Registry m_registry;
-		RenderCameraParamsSystem* m_renderCameraParamsSystem = nullptr;
+		CameraSystem* m_cameraSystem = nullptr;
 		RenderSystem* m_renderSystem = nullptr;
 		PhysicsSystem* m_physicsSystem = nullptr;
 	private:
